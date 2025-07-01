@@ -316,11 +316,11 @@ function App() {
       {/* Достижения для текущей вкладки */}
       {(tab === "books" || tab === "movies") && (
         <div className="w-full max-w-2xl mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-zinc-100 dark:bg-zinc-800 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-700 shadow">
+          <div className="flex flex-col gap-4 bg-zinc-100 dark:bg-zinc-800 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-700 shadow">
             <div className="font-bold text-lg text-black dark:text-white mb-2 md:mb-0">
               {tab === "books" ? "Достижения — Книги" : "Достижения — Фильмы"}
             </div>
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-3 flex-wrap justify-start">
               {(tab === "books" ? BOOK_ACHIEVEMENTS : MOVIE_ACHIEVEMENTS).map((a) => (
                 <div key={a.key} className={`flex flex-col items-center text-center ${(tab === "books" ? bookAchievements : movieAchievements).includes(a.key) ? "opacity-100" : "opacity-40"}`} title={a.desc}>
                   <span className="text-2xl md:text-3xl">{a.icon}</span>
@@ -328,7 +328,7 @@ function App() {
                 </div>
               ))}
             </div>
-            <div className="flex-1 flex items-center ml-0 md:ml-4">
+            <div className="w-full mt-2">
               <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                 <div
                   className={`h-3 transition-all duration-500 ${tab === "books" ? "bg-green-500" : "bg-blue-500"}`}
