@@ -5,6 +5,53 @@ const TABS = [
   { key: "movies", label: "Фильмы" },
 ];
 
+// Описание ачивок
+const ACHIEVEMENTS = [
+  {
+    key: "first_add",
+    label: "Первый шаг",
+    desc: "Добавь первую книгу или фильм",
+    icon: "🥇",
+    check: (data) => data.books.length + data.movies.length >= 1,
+  },
+  {
+    key: "collector",
+    label: "Коллекционер",
+    desc: "Добавь 10 книг или фильмов",
+    icon: "📚",
+    check: (data) => data.books.length + data.movies.length >= 10,
+  },
+  {
+    key: "critic",
+    label: "Критик года",
+    desc: "Поставь 5 оценок 10/10",
+    icon: "🌟",
+    check: (data) => {
+      const all = [...data.books, ...data.movies];
+      return all.filter((item) => Number(item.rating) === 10).length >= 5;
+    },
+  },
+  {
+    key: "detailed",
+    label: "Дотошный",
+    desc: "Заполни все поля у одной записи",
+    icon: "📝",
+    check: (data) => {
+      const all = [...data.books, ...data.movies];
+      return all.some(
+        (item) => item.title && item.author && item.year && item.comment && item.rating
+      );
+    },
+  },
+  {
+    key: "both_tabs",
+    label: "Разносторонний",
+    desc: "Добавь хотя бы одну запись в каждую вкладку",
+    icon: "🎬",
+    check: (data) => data.books.length > 0 && data.movies.length > 0,
+  },
+];
+
 function getInitialData() {
   const data = localStorage.getItem("mediaData");
   return data ? JSON.parse(data) : { books: [], movies: [] };
@@ -28,9 +75,27 @@ function App() {
   const [dark, setDark] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
+  const [achievements, setAchievements] = useState(() => {
+    const saved = localStorage.getItem("achievements");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showAchv, setShowAchv] = useState(null); // Для уведомления
 
   useEffect(() => {
     saveData(data);
+    // Проверка ачивок
+    const unlocked = ACHIEVEMENTS.filter((a) => a.check(data)).map((a) => a.key);
+    // Новые ачивки
+    const newOnes = unlocked.filter((key) => !achievements.includes(key));
+    if (newOnes.length > 0) {
+      setAchievements(unlocked);
+      localStorage.setItem("achievements", JSON.stringify(unlocked));
+      setShowAchv(newOnes[0]);
+      setTimeout(() => setShowAchv(null), 3500);
+    } else if (unlocked.length !== achievements.length) {
+      setAchievements(unlocked);
+      localStorage.setItem("achievements", JSON.stringify(unlocked));
+    }
   }, [data]);
 
   useEffect(() => {
@@ -213,6 +278,36 @@ function App() {
           )}
         </div>
       </div>
+      {/* Достижения */}
+      <div className="w-full max-w-2xl mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-zinc-100 dark:bg-zinc-800 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-700 shadow">
+          <div className="font-bold text-lg text-black dark:text-white mb-2 md:mb-0">Достижения</div>
+          <div className="flex gap-3 flex-wrap">
+            {ACHIEVEMENTS.map((a) => (
+              <div key={a.key} className={`flex flex-col items-center text-center ${achievements.includes(a.key) ? "opacity-100" : "opacity-40"}`} title={a.desc}>
+                <span className="text-2xl md:text-3xl">{a.icon}</span>
+                <span className="text-xs mt-1 font-medium max-w-[80px] text-black dark:text-white">{a.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex-1 flex items-center ml-0 md:ml-4">
+            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+              <div
+                className="h-3 bg-green-500 transition-all duration-500"
+                style={{ width: `${(achievements.length / ACHIEVEMENTS.length) * 100}%` }}
+              ></div>
+            </div>
+            <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-300 font-semibold">{achievements.length}/{ACHIEVEMENTS.length}</span>
+          </div>
+        </div>
+      </div>
+      {/* Уведомление о новой ачивке */}
+      {showAchv && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-2xl shadow-lg text-lg font-bold flex items-center gap-3 animate-bounce">
+          <span className="text-2xl">{ACHIEVEMENTS.find(a => a.key === showAchv).icon}</span>
+          <span>Новая ачивка: {ACHIEVEMENTS.find(a => a.key === showAchv).label}!</span>
+        </div>
+      )}
       <footer className="mt-10 text-zinc-400 text-base rounded-full px-6 py-2 bg-zinc-50 dark:bg-zinc-900 shadow">by zait • локальное приложение</footer>
     </div>
   );
