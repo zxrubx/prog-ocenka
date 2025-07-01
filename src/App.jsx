@@ -328,8 +328,8 @@ function App() {
                 </div>
               ))}
             </div>
-            <div className="w-full mt-2">
-              <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+            <div className="w-full mt-2 flex items-center justify-center">
+              <div className="w-[120px] h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                 <div
                   className={`h-1.5 transition-all duration-500 ${tab === "books" ? "bg-green-500" : "bg-blue-500"}`}
                   style={{ width: `${((tab === "books" ? bookAchievements.length : movieAchievements.length) / (tab === "books" ? BOOK_ACHIEVEMENTS.length : MOVIE_ACHIEVEMENTS.length)) * 100}%` }}
